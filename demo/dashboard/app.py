@@ -23,7 +23,7 @@ def realtime_metrics():
     """Mock real-time metrics for live demo"""
     return jsonify({
         "timestamp": datetime.utcnow().isoformat(),
-        "models_deployed": 3,
+            "models_deployed": 3,
         "active_experiments": 12,
         "predictions_today": 145234,
         "avg_latency_ms": 45,

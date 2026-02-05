@@ -39,3 +39,9 @@ htmlcov/
 # Misc
 *.swp
 *.swo
+
+# Test files
+test_*.py
+*_test.py
+demo_*.py
+quick_test.py

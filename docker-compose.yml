@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Model Registry - Experiment tracking backend
+  model-registry:
+    build:
+      context: ./backend/model-registry
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./data/experiments:/app/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - mlops-network
+
+  # Mock Monitoring Dashboard
+  dashboard:
+    build:
+      context: ./demo/dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      model-registry:
+        condition: service_healthy
+    networks:
+      - mlops-network
+
+  # Mock Production Model Endpoint
+  model-serving:
+    build:
+      context: ./demo/model-serving
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - MODEL_REGISTRY_URL=http://model-registry:5000
+    depends_on:
+      model-registry:
+        condition: service_healthy
+    networks:
+      - mlops-network
+
+networks:
+  mlops-network:
+    driver: bridge
+
+volumes:
+  experiment-data:
